@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue"
+import type { Task } from "./types"
 
 // データ定義
-const tasks = ref([])
-const newTaskTitle = ref("")
+const tasks = ref<Task[]>([])
+const newTaskTitle = ref<string>("")
 const API_URL = "http://localhost:8080/api/tasks"
 
 // --- モーダル関連のデータ定義 ---
 const showEditModal = ref(false)
 // 編集中のタスク情報を一時的に保持するオブジェクト
-const editingTask = ref({
-  id: null,
+const editingTask = ref<Task>({
+  id: "",
   title: "",
   completed: false,
 })
@@ -46,7 +47,7 @@ const addTask = async () => {
 }
 
 // タスクの更新 (完了状態の切替) (Update)
-const updateTask = async (task) => {
+const updateTask = async (task: Task) => {
   try {
     const response = await fetch(`${API_URL}/${task.id}`, {
       method: "PUT",
@@ -64,7 +65,7 @@ const updateTask = async (task) => {
 }
 
 // タスクの削除 (Delete)
-const deleteTask = async (id) => {
+const deleteTask = async (id: string) => {
   if (!confirm("本当に削除しますか？")) return
 
   try {
@@ -78,14 +79,14 @@ const deleteTask = async (id) => {
   }
 }
 
-const openEditModal = (task) => {
+const openEditModal = (task: Task) => {
   editingTask.value = { ...task }
   showEditModal.value = true
 }
 
 const closeEditModal = () => {
   editingTask.value = {
-    id: null,
+    id: "",
     title: "",
     completed: false,
   }
@@ -113,7 +114,7 @@ onMounted(() => {
     </div>
 
     <ul>
-      <li v-for="task in tasks" :key="task.id" class="task-item">
+      <li v-for="task in tasks" :key="task.id.toString()" class="task-item">
         <span
           :class="{ completed: task.completed }"
           @click="updateTask({ ...task, completed: !task.completed })"
@@ -121,7 +122,7 @@ onMounted(() => {
           {{ task.title }}
         </span>
         <button @click="openEditModal(task)" class="edit-btn">編集</button>
-        <button @click="deleteTask(task.id)" class="delete-btn">削除</button>
+        <button @click="deleteTask(task.id.toString())" class="delete-btn">削除</button>
       </li>
 
       <div
