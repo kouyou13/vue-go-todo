@@ -6,7 +6,7 @@ import type { Task } from "./types"
 // データ定義
 const tasks = ref<Task[]>([])
 const newTaskTitle = ref<string>("")
-const API_URL = "http://localhost:8080/api/tasks"
+const API_URL = import.meta.env.VITE_API_URL
 
 // --- モーダル関連のデータ定義 ---
 const showEditModal = ref(false)
