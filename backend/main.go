@@ -11,10 +11,10 @@ import (
 
 // Task データ構造の定義
 type Task struct {
-	ID         string    `json:"id"`
-	Created_at time.Time `json:"createdAt"`
-	Title      string    `json:"title"`
-	Completed  bool      `json:"completed"`
+	ID         string     `json:"id"`
+	Created_at time.Time  `json:"createdAt"`
+	Title      string     `json:"title"`
+	Completed  bool       `json:"completed"`
 	Limited_at *time.Time `json:"limitedAt"`
 }
 
