@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -44,8 +45,12 @@ func main() {
 		api.DELETE("/tasks/:id", deleteTask)
 	}
 
-	// サーバーをポート8080で起動
-	r.Run(":8080")
+	// システムが割り当てられるポートに設定
+	port := os.Getenv("PORT") // 環境変数PORTを取得
+	if port == "" {
+			port = "8080" // ローカル用のデフォルト
+	}
+	r.Run(":" + port)
 }
 
 // --- ハンドラー関数 ---
