@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
+import dayjs from "dayjs"
 import type { Task } from "./types"
 
 // データ定義
@@ -14,7 +15,9 @@ const editingTask = ref<Task>({
   id: "",
   title: "",
   completed: false,
+  limitedAt: null,
 })
+console.log(editingTask.value)
 
 // --- API通信用の関数 ---
 
@@ -23,6 +26,7 @@ const fetchTasks = async () => {
   try {
     const response = await fetch(API_URL)
     tasks.value = await response.json()
+    console.log(tasks.value)
   } catch (error) {
     console.error("Error fetching tasks:", error)
   }
@@ -52,13 +56,20 @@ const updateTask = async (task: Task) => {
     const response = await fetch(`${API_URL}/${task.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(task),
+      body: JSON.stringify({
+        ...task,
+        limitedAt: task.limitedAt ? dayjs(task.limitedAt).toISOString() : null,
+      }),
     })
     const updatedTask = await response.json()
     // 配列内の該当タスクを更新
     const index = tasks.value.findIndex((t) => t.id === task.id)
-    tasks.value[index] = updatedTask
-    closeEditModal()
+    tasks.value[index] = {
+      ...updatedTask,
+      limitedAt: updatedTask.limitedAt
+        ? dayjs(updatedTask.limitedAt).format("YYYY-MM-DD")
+        : null,
+    }
   } catch (error) {
     console.error("Error updating task:", error)
   }
@@ -89,6 +100,7 @@ const closeEditModal = () => {
     id: "",
     title: "",
     completed: false,
+    limitedAt: null,
   }
   showEditModal.value = false
 }
@@ -114,7 +126,7 @@ onMounted(() => {
     </div>
 
     <ul>
-      <li v-for="task in tasks" :key="task.id.toString()" class="task-item">
+      <li v-for="task in tasks" :key="task.id" class="task-item">
         <span
           :class="{ completed: task.completed }"
           @click="updateTask({ ...task, completed: !task.completed })"
@@ -122,7 +134,9 @@ onMounted(() => {
           {{ task.title }}
         </span>
         <button @click="openEditModal(task)" class="edit-btn">編集</button>
-        <button @click="deleteTask(task.id.toString())" class="delete-btn">削除</button>
+        <button @click="deleteTask(task.id.toString())" class="delete-btn">
+          削除
+        </button>
       </li>
 
       <div
@@ -131,17 +145,30 @@ onMounted(() => {
         @click.self="closeEditModal"
       >
         <div class="modal-content">
-          <h2>タスク名の編集</h2>
+          <h2>編集</h2>
+          <p>タスク名</p>
+          <input v-model="editingTask.title" type="text" class="modal-input" />
+          <p>期限</p>
           <input
-            v-model="editingTask.title"
-            type="text"
-            class="modal-input"
+            v-model="editingTask.limitedAt"
+            type="date"
+            class="modal-date-input"
           />
           <div class="modal-actions">
             <button @click="closeEditModal" class="cancel-btn">
               キャンセル
             </button>
-            <button @click="updateTask(editingTask)" class="save-btn">保存</button>
+            <button
+              @click="
+                () => {
+                  updateTask(editingTask)
+                  closeEditModal()
+                }
+              "
+              class="save-btn"
+            >
+              保存
+            </button>
           </div>
         </div>
       </div>
@@ -182,6 +209,11 @@ button {
 ul {
   list-style: none;
   padding: 0;
+}
+
+p {
+  text-align: left;
+  margin: 1% 0;
 }
 
 .task-item {
@@ -250,6 +282,12 @@ ul {
 }
 
 .modal-input {
+  width: 100%;
+  box-sizing: border-box; /* paddingを含めた幅計算にする */
+  margin-bottom: 20px;
+}
+
+.modal-date-input {
   width: 100%;
   box-sizing: border-box; /* paddingを含めた幅計算にする */
   margin-bottom: 20px;

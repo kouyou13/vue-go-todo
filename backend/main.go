@@ -12,16 +12,17 @@ import (
 // Task データ構造の定義
 type Task struct {
 	ID         string    `json:"id"`
-	Created_at time.Time `json:"created_at"`
+	Created_at time.Time `json:"createdAt"`
 	Title      string    `json:"title"`
 	Completed  bool      `json:"completed"`
+	Limited_at *time.Time `json:"limitedAt"`
 }
 
 // メモリ上のデータベース（簡易的なストレージ）
 var timezone = time.FixedZone("Asia/Tokyo", 9*60*60)
 var tasks = [] Task {
-	{ID: "e9f9c03e-d36b-470a-8735-c79e3cb848a3", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Goの勉強", Completed: false},
-	{ID: "380153cc-3677-45c2-b122-8744075c9011", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Vue.jsのセットアップ", Completed: true},
+	{ID: "e9f9c03e-d36b-470a-8735-c79e3cb848a3", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Goの勉強", Completed: false, Limited_at: nil},
+	{ID: "380153cc-3677-45c2-b122-8744075c9011", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Vue.jsのセットアップ", Completed: true, Limited_at: nil},
 }
 
 func main() {
@@ -84,6 +85,7 @@ func updateTask(c *gin.Context) {
 			// タイトルと完了状態を更新
 			tasks[i].Title = updatedTask.Title
 			tasks[i].Completed = updatedTask.Completed
+			tasks[i].Limited_at = updatedTask.Limited_at
 			c.JSON(http.StatusOK, tasks[i])
 			return
 		}

@@ -1,5 +1,6 @@
 export type Task = {
-  id: String
-  title: String
+  id: string
+  title: string
   completed: Boolean
+  limitedAt: string | null
 }
