@@ -1,30 +1,38 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import dayjs from "dayjs"
 import type { Task } from "./types"
 
 // データ定義
 const tasks = ref<Task[]>([])
-const newTaskTitle = ref<string>("")
+const searchWord = ref<string>("")
 const API_URL = import.meta.env.VITE_API_URL
 
 // --- モーダル関連のデータ定義 ---
+const showCreateModal = ref(false)
 const showEditModal = ref(false)
+
 // 編集中のタスク情報を一時的に保持するオブジェクト
-const editingTask = ref<Task>({
+const emptyTask = {
   id: "",
   title: "",
   completed: false,
   limitedAt: null,
-})
-console.log(editingTask.value)
+  note: "",
+}
+const editingTask = ref<Task>({ ...emptyTask })
 
 // --- API通信用の関数 ---
 
 // タスク一覧の取得 (Read)
 const fetchTasks = async () => {
   try {
-    const response = await fetch(API_URL)
+    const url =
+      searchWord.value !== ""
+        ? `${API_URL}?title=${encodeURIComponent(searchWord.value)}`
+        : API_URL
+    console.log(url)
+    const response = await fetch(url)
     tasks.value = await response.json()
     console.log(tasks.value)
   } catch (error) {
@@ -34,17 +42,22 @@ const fetchTasks = async () => {
 
 // タスクの追加 (Create)
 const addTask = async () => {
-  if (newTaskTitle.value.trim() === "") return
+  if (editingTask.value.title.trim() === "") return
 
   try {
+    const payload = {
+      ...editingTask.value,
+      limitedAt: editingTask.value.limitedAt
+        ? dayjs(editingTask.value.limitedAt).toISOString()
+        : null,
+    }
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTaskTitle.value, completed: false }),
+      body: JSON.stringify(payload),
     })
     const newTask = await response.json()
-    tasks.value.push(newTask) // 配列に追加
-    newTaskTitle.value = "" // 入力欄をクリア
+    tasks.value.push({ ...newTask, limitedAt: editingTask.value.limitedAt }) // 配列に追加
   } catch (error) {
     console.error("Error adding task:", error)
   }
@@ -66,9 +79,7 @@ const updateTask = async (task: Task) => {
     const index = tasks.value.findIndex((t) => t.id === task.id)
     tasks.value[index] = {
       ...updatedTask,
-      limitedAt: updatedTask.limitedAt
-        ? dayjs(updatedTask.limitedAt).format("YYYY-MM-DD")
-        : null,
+      limitedAt: task.limitedAt,
     }
   } catch (error) {
     console.error("Error updating task:", error)
@@ -90,23 +101,31 @@ const deleteTask = async (id: string) => {
   }
 }
 
+const openCreateModal = () => {
+  editingTask.value = { ...emptyTask }
+  showCreateModal.value = true
+}
+
+const closeCreateModal = () => {
+  showCreateModal.value = false
+}
+
 const openEditModal = (task: Task) => {
   editingTask.value = { ...task }
   showEditModal.value = true
 }
 
 const closeEditModal = () => {
-  editingTask.value = {
-    id: "",
-    title: "",
-    completed: false,
-    limitedAt: null,
-  }
+  editingTask.value = { ...emptyTask }
   showEditModal.value = false
 }
 
 // コンポーネントがマウントされたらタスクを取得
 onMounted(() => {
+  fetchTasks()
+})
+// リアルタイムで変数を監視
+watch(searchWord, () => {
   fetchTasks()
 })
 </script>
@@ -116,13 +135,8 @@ onMounted(() => {
     <h1>Vue + Go Todo App</h1>
 
     <div class="add-task">
-      <input
-        v-model="newTaskTitle"
-        @keyup.enter="addTask"
-        type="text"
-        placeholder="新しいタスクを入力..."
-      />
-      <button @click="addTask">追加</button>
+      <input v-model="searchWord" type="text" placeholder="タスクを検索..." />
+      <button @click="openCreateModal">追加</button>
     </div>
 
     <ul>
@@ -140,6 +154,42 @@ onMounted(() => {
       </li>
 
       <div
+        v-if="showCreateModal"
+        class="modal-overlay"
+        @click.self="closeCreateModal"
+      >
+        <div class="modal-content">
+          <h2>タスク追加</h2>
+          <p>タスク名</p>
+          <input v-model="editingTask.title" type="text" class="modal-input" />
+          <p>期限</p>
+          <input
+            v-model="editingTask.limitedAt"
+            type="date"
+            class="modal-date-input"
+          />
+          <p>備考</p>
+          <textarea v-model="editingTask.note" class="modal-textarea" />
+          <div class="modal-actions">
+            <button @click="closeCreateModal" class="cancel-btn">
+              キャンセル
+            </button>
+            <button
+              @click="
+                () => {
+                  addTask()
+                  closeCreateModal()
+                }
+              "
+              class="save-btn"
+            >
+              追加
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
         v-if="showEditModal"
         class="modal-overlay"
         @click.self="closeEditModal"
@@ -154,6 +204,8 @@ onMounted(() => {
             type="date"
             class="modal-date-input"
           />
+          <p>備考</p>
+          <textarea v-model="editingTask.note" class="modal-textarea" />
           <div class="modal-actions">
             <button @click="closeEditModal" class="cancel-btn">
               キャンセル
@@ -283,13 +335,20 @@ p {
 
 .modal-input {
   width: 100%;
-  box-sizing: border-box; /* paddingを含めた幅計算にする */
+  box-sizing: border-box;
   margin-bottom: 20px;
 }
 
 .modal-date-input {
   width: 100%;
-  box-sizing: border-box; /* paddingを含めた幅計算にする */
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.modal-textarea {
+  width: 100%;
+  height: 5vh;
+  box-sizing: border-box;
   margin-bottom: 20px;
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -17,13 +18,14 @@ type Task struct {
 	Title      string     `json:"title"`
 	Completed  bool       `json:"completed"`
 	Limited_at *time.Time `json:"limitedAt"`
+	Note       string     `json:"note"`
 }
 
 // メモリ上のデータベース（簡易的なストレージ）
 var timezone = time.FixedZone("Asia/Tokyo", 9*60*60)
 var tasks = [] Task {
-	{ID: "e9f9c03e-d36b-470a-8735-c79e3cb848a3", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Goの勉強", Completed: false, Limited_at: nil},
-	{ID: "380153cc-3677-45c2-b122-8744075c9011", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Vue.jsのセットアップ", Completed: true, Limited_at: nil},
+	{ID: "e9f9c03e-d36b-470a-8735-c79e3cb848a3", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Goの勉強", Completed: false, Limited_at: nil, Note: "テスト"},
+	{ID: "380153cc-3677-45c2-b122-8744075c9011", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Vue.jsのセットアップ", Completed: true, Limited_at: nil, Note: ""},
 }
 
 func main() {
@@ -57,7 +59,20 @@ func main() {
 
 // 全てのタスクを取得
 func getTasks(c *gin.Context) {
-	c.JSON(http.StatusOK, tasks)
+	searchTitle := c.Query("title")
+
+	if searchTitle == "" {
+		c.JSON(http.StatusOK, tasks)
+		return
+	}
+
+	var filteredTasks []Task
+	for _, task := range tasks {
+		if strings.Contains(strings.ToLower(task.Title), strings.ToLower(searchTitle)){
+			filteredTasks = append(filteredTasks, task)
+		}
+	}
+	c.JSON(http.StatusOK, filteredTasks)
 }
 
 // 新しいタスクを作成
@@ -91,6 +106,7 @@ func updateTask(c *gin.Context) {
 			tasks[i].Title = updatedTask.Title
 			tasks[i].Completed = updatedTask.Completed
 			tasks[i].Limited_at = updatedTask.Limited_at
+			tasks[i].Note = updatedTask.Note
 			c.JSON(http.StatusOK, tasks[i])
 			return
 		}

@@ -3,4 +3,5 @@ export type Task = {
   title: string
   completed: Boolean
   limitedAt: string | null
+  note: string
 }
