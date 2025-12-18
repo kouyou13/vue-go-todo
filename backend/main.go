@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -58,7 +59,20 @@ func main() {
 
 // 全てのタスクを取得
 func getTasks(c *gin.Context) {
-	c.JSON(http.StatusOK, tasks)
+	searchTitle := c.Query("title")
+
+	if searchTitle == "" {
+		c.JSON(http.StatusOK, tasks)
+		return
+	}
+
+	var filteredTasks []Task
+	for _, task := range tasks {
+		if strings.Contains(strings.ToLower(task.Title), strings.ToLower(searchTitle)){
+			filteredTasks = append(filteredTasks, task)
+		}
+	}
+	c.JSON(http.StatusOK, filteredTasks)
 }
 
 // 新しいタスクを作成

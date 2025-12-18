@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import dayjs from "dayjs"
 import type { Task } from "./types"
 
@@ -27,7 +27,12 @@ const editingTask = ref<Task>({ ...emptyTask })
 // タスク一覧の取得 (Read)
 const fetchTasks = async () => {
   try {
-    const response = await fetch(API_URL)
+    const url =
+      searchWord.value !== ""
+        ? `${API_URL}?title=${encodeURIComponent(searchWord.value)}`
+        : API_URL
+    console.log(url)
+    const response = await fetch(url)
     tasks.value = await response.json()
     console.log(tasks.value)
   } catch (error) {
@@ -117,6 +122,10 @@ const closeEditModal = () => {
 
 // コンポーネントがマウントされたらタスクを取得
 onMounted(() => {
+  fetchTasks()
+})
+// リアルタイムで変数を監視
+watch(searchWord, () => {
   fetchTasks()
 })
 </script>
