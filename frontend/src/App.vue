@@ -1,24 +1,28 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue"
 import dayjs from "dayjs"
-import type { Task } from "./types"
+import type { Task, Category } from "./types"
 
 // データ定義
 const tasks = ref<Task[]>([])
+const categories = ref<Category[]>([])
 const searchWord = ref<string>("")
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL: string = import.meta.env.VITE_API_URL
 
 // --- モーダル関連のデータ定義 ---
-const showCreateModal = ref(false)
-const showEditModal = ref(false)
+const showCreateModal = ref<boolean>(false)
+const showEditModal = ref<boolean>(false)
+const showSelectCategoryModal = ref<boolean>(false)
+const selectedCategoryId = ref<string | null>(null)
 
 // 編集中のタスク情報を一時的に保持するオブジェクト
-const emptyTask = {
+const emptyTask: Task = {
   id: "",
   title: "",
   completed: false,
   limitedAt: null,
   note: "",
+  categoryId: null,
 }
 const editingTask = ref<Task>({ ...emptyTask })
 
@@ -29,12 +33,10 @@ const fetchTasks = async () => {
   try {
     const url =
       searchWord.value !== ""
-        ? `${API_URL}?title=${encodeURIComponent(searchWord.value)}`
-        : API_URL
-    console.log(url)
+        ? `${API_URL}/tasks?title=${encodeURIComponent(searchWord.value)}`
+        : `${API_URL}/tasks`
     const response = await fetch(url)
     tasks.value = await response.json()
-    console.log(tasks.value)
   } catch (error) {
     console.error("Error fetching tasks:", error)
   }
@@ -42,7 +44,10 @@ const fetchTasks = async () => {
 
 // タスクの追加 (Create)
 const addTask = async () => {
-  if (editingTask.value.title.trim() === "") return
+  if (editingTask.value.title === "") {
+    alert("タスク名が未入力です")
+    return
+  }
 
   try {
     const payload = {
@@ -51,7 +56,7 @@ const addTask = async () => {
         ? dayjs(editingTask.value.limitedAt).toISOString()
         : null,
     }
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -65,8 +70,13 @@ const addTask = async () => {
 
 // タスクの更新 (完了状態の切替) (Update)
 const updateTask = async (task: Task) => {
+  if (task.title === "") {
+    alert("タスク名が未入力です")
+    return
+  }
+
   try {
-    const response = await fetch(`${API_URL}/${task.id}`, {
+    const response = await fetch(`${API_URL}/tasks/${task.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -91,13 +101,24 @@ const deleteTask = async (id: string) => {
   if (!confirm("本当に削除しますか？")) return
 
   try {
-    await fetch(`${API_URL}/${id}`, {
+    await fetch(`${API_URL}/tasks/${id}`, {
       method: "DELETE",
     })
     // 配列から該当タスクを削除
     tasks.value = tasks.value.filter((task) => task.id !== id)
   } catch (error) {
     console.error("Error deleting task:", error)
+  }
+}
+
+// タスク一覧の取得 (Read)
+const fetchCategories = async () => {
+  try {
+    const url = `${API_URL}/categories`
+    const response = await fetch(url)
+    categories.value = await response.json()
+  } catch (error) {
+    console.error("Error fetching categories:", error)
   }
 }
 
@@ -120,9 +141,19 @@ const closeEditModal = () => {
   showEditModal.value = false
 }
 
+const openSelectCategoryModal = () => {
+  selectedCategoryId.value = editingTask.value.categoryId
+  showSelectCategoryModal.value = true
+}
+
+const closeSelectCategoryModal = () => {
+  showSelectCategoryModal.value = false
+}
+
 // コンポーネントがマウントされたらタスクを取得
 onMounted(() => {
   fetchTasks()
+  fetchCategories()
 })
 // リアルタイムで変数を監視
 watch(searchWord, () => {
@@ -136,7 +167,7 @@ watch(searchWord, () => {
 
     <div class="add-task">
       <input v-model="searchWord" type="text" placeholder="タスクを検索..." />
-      <button @click="openCreateModal">追加</button>
+      <button @click="openCreateModal">＋追加</button>
     </div>
 
     <ul>
@@ -204,6 +235,17 @@ watch(searchWord, () => {
             type="date"
             class="modal-date-input"
           />
+          <p>カテゴリー</p>
+          <div class="modal-category-input" @click="openSelectCategoryModal">
+            <div v-if="editingTask.categoryId == null" class="category-tag">
+              なし
+            </div>
+            <div v-else class="category-tag" style="background-color: blue">
+              {{
+                categories.find((c) => c.id === editingTask.categoryId)?.name
+              }}
+            </div>
+          </div>
           <p>備考</p>
           <textarea v-model="editingTask.note" class="modal-textarea" />
           <div class="modal-actions">
@@ -220,6 +262,56 @@ watch(searchWord, () => {
               class="save-btn"
             >
               保存
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="showSelectCategoryModal"
+        class="modal-overlay"
+        @click.self="closeSelectCategoryModal"
+      >
+        <div class="modal-content">
+          <h2>カテゴリー選択</h2>
+          <div style="margin-bottom: 5px">
+            <label>
+              <input
+                type="radio"
+                name="category"
+                :value="null"
+                v-model="selectedCategoryId"
+              />
+              <span class="category-tag">なし</span>
+            </label>
+          </div>
+          <div v-for="category in categories" style="margin-bottom: 5px">
+            <label>
+              <input
+                type="radio"
+                name="category"
+                :value="category.id"
+                v-model="selectedCategoryId"
+              />
+              <span class="category-tag" style="background-color: blue">
+                {{ category.name }}
+              </span>
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button @click="closeSelectCategoryModal" class="cancel-btn">
+              キャンセル
+            </button>
+            <button
+              @click="
+                () => {
+                  editingTask.categoryId = selectedCategoryId
+                  closeSelectCategoryModal()
+                }
+              "
+              class="save-btn"
+            >
+              追加
             </button>
           </div>
         </div>
@@ -345,6 +437,29 @@ p {
   margin-bottom: 20px;
 }
 
+.modal-category-input {
+  width: 100%;
+  height: 3vh;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  text-align-last: center;
+  align-content: center;
+  justify-items: center;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-category-input:hover {
+  background-color: #333;
+}
+
+.category-tag {
+  max-width: 70%;
+  padding: 0.5% 2%;
+  border-radius: 5%;
+  cursor: pointer;
+}
+
 .modal-textarea {
   width: 100%;
   height: 5vh;
@@ -356,6 +471,7 @@ p {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .cancel-btn {

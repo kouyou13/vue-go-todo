@@ -4,4 +4,10 @@ export type Task = {
   completed: Boolean
   limitedAt: string | null
   note: string
+  categoryId: string | null
+}
+
+export type Category = {
+  id: string
+  name: string
 }

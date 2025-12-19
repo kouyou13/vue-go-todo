@@ -19,13 +19,25 @@ type Task struct {
 	Completed  bool       `json:"completed"`
 	Limited_at *time.Time `json:"limitedAt"`
 	Note       string     `json:"note"`
+	CategoryId *string     `json:"categoryId"`
+}
+
+// Category データ構造の定義
+type Category struct {
+	ID         string     `json:"id"`
+	Created_at time.Time  `json:"createdAt"`
+	Name       string     `json:"name"`
 }
 
 // メモリ上のデータベース（簡易的なストレージ）
 var timezone = time.FixedZone("Asia/Tokyo", 9*60*60)
 var tasks = [] Task {
-	{ID: "e9f9c03e-d36b-470a-8735-c79e3cb848a3", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Goの勉強", Completed: false, Limited_at: nil, Note: "テスト"},
-	{ID: "380153cc-3677-45c2-b122-8744075c9011", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Vue.jsのセットアップ", Completed: true, Limited_at: nil, Note: ""},
+	{ID: "e9f9c03e-d36b-470a-8735-c79e3cb848a3", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Goの勉強", Completed: false, Limited_at: nil, Note: "テスト", CategoryId: nil},
+	{ID: "380153cc-3677-45c2-b122-8744075c9011", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Title: "Vue.jsのセットアップ", Completed: true, Limited_at: nil, Note: "", CategoryId: nil},
+}
+var categories = [] Category {
+	{ID: "672bb739-506b-4263-8a87-23ccc1645fc7", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Name: "仕事"},
+	{ID: "ec38e055-95a6-4180-ab8e-5ed5142cf533", Created_at: time.Date(1900, 1, 1, 0, 0, 0, 0, timezone), Name: "プライベート"},
 }
 
 func main() {
@@ -45,6 +57,12 @@ func main() {
 		api.POST("/tasks", createTask)
 		api.PUT("/tasks/:id", updateTask)
 		api.DELETE("/tasks/:id", deleteTask)
+
+		api.GET("/category/:id", getCategory)
+		api.GET("/categories", getCategories)
+		api.POST("/categories", createCategory)
+		api.PUT("/categories/:id", updateCategory)
+		api.DELETE("/categories/:id", deleteCategory)
 	}
 
 	// システムが割り当てられるポートに設定
@@ -103,10 +121,7 @@ func updateTask(c *gin.Context) {
 	for i, task := range tasks {
 		if task.ID == id {
 			// タイトルと完了状態を更新
-			tasks[i].Title = updatedTask.Title
-			tasks[i].Completed = updatedTask.Completed
-			tasks[i].Limited_at = updatedTask.Limited_at
-			tasks[i].Note = updatedTask.Note
+			tasks[i] = updatedTask
 			c.JSON(http.StatusOK, tasks[i])
 			return
 		}
@@ -127,4 +142,72 @@ func deleteTask(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+}
+
+// カテゴリー取得
+func getCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	for _, category := range categories {
+		if category.ID == id {
+			c.JSON(http.StatusOK, category)
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
+}
+
+// カテゴリー全取得
+func getCategories(c *gin.Context) {
+	c.JSON(http.StatusOK, categories)
+}
+
+// カテゴリー追加
+func createCategory(c *gin.Context) {
+	var newCategory Category
+	// リクエストボディのJSONを構造体にバインド
+	if err := c.ShouldBindJSON(&newCategory); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	newCategory.ID = uuid.NewString()
+	newCategory.Created_at = time.Now()
+	categories = append(categories, newCategory)
+	c.JSON(http.StatusCreated, newCategory)
+}
+
+// カテゴリーの更新
+func updateCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	var updatedCategory Category
+	if err := c.ShouldBindJSON(&updatedCategory); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	for i, category := range categories {
+		if category.ID == id {
+			// タイトルと完了状態を更新
+			categories[i] = updatedCategory
+			c.JSON(http.StatusOK, categories[i])
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
+}
+
+// カテゴリーの削除
+func deleteCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	for i, category := range categories {
+		if category.ID == id {
+			// スライスから要素を削除
+			categories = append(categories[:i], categories[i+1:]...)
+			c.JSON(http.StatusOK, gin.H{"message": "Category deleted"})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 }
