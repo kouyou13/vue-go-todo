@@ -1,7 +1,7 @@
 export type Task = {
   id: string
   title: string
-  completed: Boolean
+  completed: boolean
   limitedAt: string | null
   note: string
   categoryId: string | null

@@ -58,7 +58,6 @@ func main() {
 		api.PUT("/tasks/:id", updateTask)
 		api.DELETE("/tasks/:id", deleteTask)
 
-		api.GET("/category/:id", getCategory)
 		api.GET("/categories", getCategories)
 		api.POST("/categories", createCategory)
 		api.PUT("/categories/:id", updateCategory)
