@@ -8,7 +8,7 @@ import (
 
 // RegisterRoutes は task に関するルートを登録する
 func RegisterRoutes(rg *gin.RouterGroup) {
-	tasksRg := rg.Group("/api/tasks")
+	tasksRg := rg.Group("/tasks")
 	{
 		tasksRg.GET("", getTasks)
 		tasksRg.POST("", postTask)
