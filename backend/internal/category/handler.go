@@ -8,7 +8,7 @@ import (
 
 // RegisterRoutes は category に関するルートを登録する
 func RegisterRoutes(rg *gin.RouterGroup) {
-	tasksRg := rg.Group("/api/categories")
+	tasksRg := rg.Group("/categories")
 	{
 		tasksRg.GET("", getCategories)
 		tasksRg.POST("", postCategories)
