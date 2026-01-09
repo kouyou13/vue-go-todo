@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router"
 
-import TodoPage from "../pages/TodoPage.vue"
+import Todo from "../pages/Todo.vue"
 
 export default createRouter({
   history: createWebHistory(),
-  routes: [{ path: "/", component: TodoPage }],
+  routes: [{ path: "/", component: Todo }],
 })

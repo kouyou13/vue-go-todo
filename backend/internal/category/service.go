@@ -8,7 +8,18 @@ import (
 )
 
 // categories はメモリ上の擬似DB
-var categories = []Category{}
+var categories = []Category{
+	{
+		ID: "308cb5ae-a1a8-41e7-9527-315a319ad399",
+		CreatedAt: time.Date(2026, 1, 1, 10, 0, 0, 0, time.Local),
+		Name: "カテゴリー1",
+	},
+	{
+		ID: "4695698c-2dd1-457a-aa90-5e5878980997",
+		CreatedAt: time.Date(2026, 1, 2, 10, 0, 0, 0, time.Local),
+		Name: "カテゴリー2",
+	},
+}
 
 // GetAll は全タスクを返す
 func GetAll() []Category {

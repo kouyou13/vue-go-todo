@@ -24,10 +24,10 @@
           <span class="max-w-9/12 px-2 rounded-md cursor-pointer">なし</span>
         </label>
       </div>
-      <div v-for="category in categories" :key="category.id" class="my-2">
+      <div v-for="category in categories" :key="category.id" class="my-4">
         <label>
-          <input v-model="selectedCategoryId" type="radio" name="category" :value="category.id" />
-          <span class="max-w-9/12 px-2 py-8 rounded-md cursor-pointer bg-blue-600">
+          <input v-model="selectedCategoryId" type="radio" name="category" :value="category.id" class="mx-2" />
+          <span class="max-w-9/12 px-2 py-1 rounded-md cursor-pointer bg-blue-600">
             {{ category.name }}
           </span>
         </label>

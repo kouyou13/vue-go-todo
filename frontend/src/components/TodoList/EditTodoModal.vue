@@ -55,8 +55,8 @@
       <input v-model="editingTask.limitedAt" type="date" class="w-11/12 mb-5" />
       <p class="text-left my-1">カテゴリー</p>
       <div class="w-11/12 h-9 mb-5 mx-auto hover:bg-gray-800" @click="openSelectCategoryModal">
-        <div v-if="editingTask.categoryId == null" class="w-full mx-1.5">なし</div>
-        <div v-else class="w-full mx-1.5" style="background-color: blue">
+        <div v-if="editingTask.categoryId == null" class="w-full py-1.5">なし</div>
+        <div v-else class="w-full bg-blue-600 py-1.5">
           {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
         </div>
       </div>

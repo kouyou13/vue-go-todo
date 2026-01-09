@@ -32,7 +32,7 @@
 
 <template>
   <div class="mx-auto font-sans">
-    <h1 class="text-7xl font-bold text-center mb-16 mx-20">Vue + Go Todo App</h1>
+    <h1 class="text-7xl font-bold text-center mt-96 mb-16 mx-20">Vue + Go Todo App</h1>
 
     <div class="flex gap-2.5 mb-5 items-center">
       <input
@@ -43,7 +43,7 @@
       />
       <button
         @click="openCreateModal"
-        class="px-2.5 py-2 size-1/12 cursor-pointer bg-gray-200 text-black"
+        class="px-2.5 py-2 size-1/8 cursor-pointer bg-gray-200 text-black"
       >
         ＋追加
       </button>
