@@ -12,26 +12,36 @@
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="emit('onClose')">
-    <div class="modal-content">
-      <h2>カテゴリー選択</h2>
-      <div style="margin-bottom: 5px">
+  <div
+    class="fixed top-0 left-0 w-full h-full bg-black/80 bg-op flex justify-center items-center z-20"
+    @click.self="emit('onClose')"
+  >
+    <div class="bg-gray-950 p-6 rounded-2xl w-1/5 shadow z-20">
+      <h2 class="text-3xl">カテゴリー選択</h2>
+      <div class="my-2">
         <label>
           <input v-model="selectedCategoryId" type="radio" name="category" :value="null" />
-          <span class="category-tag">なし</span>
+          <span class="max-w-9/12 px-2 rounded-md cursor-pointer">なし</span>
         </label>
       </div>
-      <div v-for="category in categories" :key="category.id" style="margin-bottom: 5px">
+      <div v-for="category in categories" :key="category.id" class="my-2">
         <label>
           <input v-model="selectedCategoryId" type="radio" name="category" :value="category.id" />
-          <span class="category-tag" style="background-color: blue">
+          <span class="max-w-9/12 px-2 py-8 rounded-md cursor-pointer bg-blue-600">
             {{ category.name }}
           </span>
         </label>
       </div>
-      <div class="modal-actions">
-        <button class="cancel-btn" @click="emit('onClose')">キャンセル</button>
-        <button class="save-btn" @click="emit('onSave', selectedCategoryId)">保存</button>
+      <div class="flex justify-end gap-2.5 mt-2.5">
+        <button class="bg-gray-100 border-0 text-black px-2 py-1.5" @click="emit('onClose')">
+          キャンセル
+        </button>
+        <button
+          class="bg-green-600 border-0 text-white px-2 py-1.5"
+          @click="emit('onSave', selectedCategoryId)"
+        >
+          保存
+        </button>
       </div>
     </div>
   </div>

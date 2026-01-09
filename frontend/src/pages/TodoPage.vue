@@ -31,12 +31,22 @@
 </script>
 
 <template>
-  <div class="container">
-    <h1>Vue + Go Todo App</h1>
+  <div class="mx-auto p-5 font-sans">
+    <h1 class="text-7xl font-bold text-center mb-16 mx-20">Vue + Go Todo App</h1>
 
-    <div class="add-task">
-      <input v-model="searchWord" type="text" placeholder="タスクを検索..." />
-      <button @click="openCreateModal">＋追加</button>
+    <div class="flex gap-2.5 mb-5 items-center">
+      <input
+        v-model="searchWord"
+        type="text"
+        placeholder="タスクを検索..."
+        class="grow p-2.5 size-11"
+      />
+      <button
+        @click="openCreateModal"
+        class="px-2.5 py-2 size-2/12 cursor-pointer bg-gray-200 text-black"
+      >
+        ＋追加
+      </button>
     </div>
 
     <TodoList :tasks="tasks" @update-task="updateTask" @delete-task="deleteTask" />
