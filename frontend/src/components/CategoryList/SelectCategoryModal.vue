@@ -13,7 +13,7 @@
 
 <template>
   <div
-    class="fixed top-0 left-0 w-full h-full bg-black/80 bg-op flex justify-center items-center z-20"
+    class="fixed top-0 left-0 w-full h-full bg-black/60 bg-op flex justify-center items-center z-20"
     @click.self="emit('onClose')"
   >
     <div class="bg-gray-950 p-6 rounded-2xl w-1/5 shadow z-20">
