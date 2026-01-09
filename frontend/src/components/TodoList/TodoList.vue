@@ -33,7 +33,7 @@
     >
       <span
         class="grow cursor-pointer"
-        :class="{'line-through': !task.completed}"
+        :class="{'line-through': task.completed}"
         @click="emit('updateTask', { ...task, completed: !task.completed })"
       >
         {{ task.title }}

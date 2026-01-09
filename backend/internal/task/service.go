@@ -4,8 +4,6 @@ import (
 	"errors"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // tasks はメモリ上の擬似DB
@@ -43,7 +41,6 @@ func GetAll(searchTitle string) []Task {
 
 // Create はタスクを追加する処理
 func Create(t Task) Task {
-	t.ID = uuid.NewString()
 	t.CreatedAt = time.Now()
 	tasks = append(tasks, t)
 	return t
