@@ -25,13 +25,21 @@
 </script>
 
 <template>
-  <ul>
-    <li v-for="task in tasks" :key="task.id" class="task-item">
-      <span @click="emit('updateTask', { ...task, completed: !task.completed })">
+  <ul class="list-none p-0">
+    <li
+      v-for="task in tasks"
+      :key="task.id"
+      class="flex justify-between items-center p-2.5 border-b-2 border-solid border-white"
+    >
+      <span
+        class="grow cursor-pointer"
+        :class="{'line-through': !task.completed}"
+        @click="emit('updateTask', { ...task, completed: !task.completed })"
+      >
         {{ task.title }}
       </span>
       <button
-        class="edit-btn"
+        class="text-center px-3 text-sm border-0 text-white bg-blue-700 h-8"
         @click="
           () => {
             openEditModal(task)
@@ -40,7 +48,12 @@
       >
         編集
       </button>
-      <button class="delete-btn" @click="emit('deleteTask', task.id)">削除</button>
+      <button
+        class="text-center px-3 text-sm border-0 text-white bg-red-600 h-8 ml-2"
+        @click="emit('deleteTask', task.id)"
+      >
+        削除
+      </button>
 
       <EditTodoModal
         v-if="showEditModal && currentTask"
