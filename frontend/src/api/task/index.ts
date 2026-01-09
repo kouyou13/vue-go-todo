@@ -41,10 +41,7 @@ export const useTasks = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      tasks.value.push({
-        ...newTask,
-        limitedAt: newTask.limitedAt ? dayjs(newTask.limitedAt).format("YYYY-MM-DD") : null,
-      }) // 配列に追加
+      fetchTasks("")
     } catch (error) {
       console.error("Error adding task:", error)
     }
