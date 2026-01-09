@@ -44,14 +44,14 @@
       <p class="text-left my-1">カテゴリー</p>
       <div class="w-11/12 h-9 mb-5 mx-auto hover:bg-gray-800" @click="openSelectCategoryModal">
         <div v-if="editingTask.categoryId == null" class="w-full mx-1.5">なし</div>
-        <div v-else class="category-tag" style="background-color: blue">
+        <div v-else class="w-full mx-1.5" style="background-color: blue">
           {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
         </div>
       </div>
       <p class="text-left my-1">備考</p>
       <textarea
-        placeholder="memo..."
         v-model="editingTask.note"
+        placeholder="memo..."
         class="w-11/12 h-16 box-border mb-5"
       />
 
