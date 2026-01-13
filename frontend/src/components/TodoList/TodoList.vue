@@ -25,36 +25,43 @@
 </script>
 
 <template>
-  <ul class="list-none p-0">
-    <li
-      v-for="task in tasks"
-      :key="task.id"
-      class="flex justify-between items-center p-2.5 border-b-2 border-solid border-white"
-    >
-      <span
-        class="grow cursor-pointer"
-        :class="{'line-through': task.completed}"
+  <table class="w-full">
+    <tr class="border-b">
+      <th class="text-sm text-gray-400">タイトル</th>
+      <th class="text-sm text-gray-400">期限</th>
+      <th></th>
+      <th></th>
+    </tr>
+    <tr v-for="task in tasks" :key="task.id" class="border-b">
+      <td
+        class="text-lg cursor-pointer"
+        :class="{ 'line-through': task.completed }"
         @click="emit('updateTask', { ...task, completed: !task.completed })"
       >
         {{ task.title }}
-      </span>
-      <button
-        class="text-center px-3 text-sm border-0 text-white bg-blue-700 h-8"
-        @click="
-          () => {
-            openEditModal(task)
-          }
-        "
-      >
-        編集
-      </button>
-      <button
-        class="text-center px-3 text-sm border-0 text-white bg-red-600 h-8 ml-2"
-        @click="emit('deleteTask', task.id)"
-      >
-        削除
-      </button>
-
+      </td>
+      <td v-if="task.limitedAt" class="w-1/10 text-lg">{{ task.limitedAt }}</td>
+      <td v-if="!task.limitedAt" class="w-1/10 text-lg">なし</td>
+      <td class="w-1/18 pl-2">
+        <button
+          class="text-center px-3 text-sm border-0 text-white bg-blue-700 h-10 w-full"
+          @click="
+            () => {
+              openEditModal(task)
+            }
+          "
+        >
+          編集
+        </button>
+      </td>
+      <td class="w-1/18 pl-3">
+        <button
+          class="text-center px-3 text-sm border-0 text-white bg-red-600 h-10 w-full my-4"
+          @click="emit('deleteTask', task.id)"
+        >
+          削除
+        </button>
+      </td>
       <EditTodoModal
         v-if="showEditModal && currentTask"
         :task="currentTask"
@@ -66,6 +73,6 @@
           }
         "
       />
-    </li>
-  </ul>
+    </tr>
+  </table>
 </template>
