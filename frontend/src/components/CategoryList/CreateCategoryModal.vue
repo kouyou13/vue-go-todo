@@ -20,7 +20,7 @@
       <input
         v-model="editingCategory.name"
         type="text"
-        class="w-11/12 my-3 border rounded-lg p-1"
+        class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
         placeholder="カテゴリー名を入力..."
       />
 
