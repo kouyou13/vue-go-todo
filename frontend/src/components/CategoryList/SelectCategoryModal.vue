@@ -7,7 +7,7 @@
     categories: { type: Array as PropType<Category[]>, default: () => [] },
     editingTask: { type: Object as PropType<Task>, default: () => null },
   })
-  const emit = defineEmits(["onClose", "onSave"])
+  const emit = defineEmits(["onClose"])
   const selectedCategoryId = ref<string | null>(props.editingTask?.categoryId || null)
 </script>
 
@@ -33,7 +33,7 @@
             :value="category.id"
             class="mx-2"
           />
-          <span class="max-w-9/12 px-2 py-1 rounded-md cursor-pointer bg-blue-600">
+          <span class="max-w-9/12 px-2 py-1 rounded-md cursor-pointer bg-blue-800">
             {{ category.name }}
           </span>
         </label>
@@ -44,7 +44,12 @@
         </button>
         <button
           class="bg-green-600 border-0 text-white px-2 py-1.5"
-          @click="emit('onSave', selectedCategoryId)"
+          @click="
+            () => {
+              editingTask.categoryId = selectedCategoryId
+              emit('onClose')
+            }
+          "
         >
           保存
         </button>

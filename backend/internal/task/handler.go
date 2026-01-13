@@ -19,8 +19,8 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 
 // getTasks はタスク一覧取得
 func getTasks(c *gin.Context) {
-	title := c.Query("title")
-	res := GetAll(title)
+	searchWord := c.Query("search")
+	res := GetAll(searchWord)
 	c.JSON(http.StatusOK, res)
 }
 

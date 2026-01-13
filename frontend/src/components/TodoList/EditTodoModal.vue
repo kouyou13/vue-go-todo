@@ -28,12 +28,8 @@
   const closeSelectCategoryModal = () => {
     showSelectCategoryModal.value = false
   }
-  const handleSelectCategory = (selectedCategoryId: string | null) => {
-    editingTask.value.categoryId = selectedCategoryId
-    closeSelectCategoryModal()
-  }
   onMounted(() => {
-    fetchCategories()
+    fetchCategories("")
   })
 </script>
 
@@ -48,15 +44,24 @@
       <input
         v-model="editingTask.title"
         type="text"
-        class="w-11/12 mb-5"
+        class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
         placeholder="タスク名を入力..."
       />
       <p class="text-left my-1">期限</p>
-      <input v-model="editingTask.limitedAt" type="date" class="w-11/12 mb-5" />
+      <input
+        v-model="editingTask.limitedAt"
+        type="date"
+        class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
+      />
       <p class="text-left my-1">カテゴリー</p>
-      <div class="w-11/12 h-9 mb-5 mx-auto hover:bg-gray-800" @click="openSelectCategoryModal">
-        <div v-if="editingTask.categoryId == null" class="w-full py-1.5">なし</div>
-        <div v-else class="w-full bg-blue-600 py-1.5">
+      <div class="w-11/12 h-9 mt-3 mb-6 mx-auto" @click="openSelectCategoryModal">
+        <div
+          v-if="editingTask.categoryId == null"
+          class="w-full py-1.5 rounded-lg hover:bg-gray-800"
+        >
+          なし
+        </div>
+        <div v-else class="w-full bg-blue-800 py-1.5 rounded-lg hover:bg-blue-900">
           {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
         </div>
       </div>
@@ -64,7 +69,7 @@
       <textarea
         v-model="editingTask.note"
         placeholder="memo..."
-        class="w-11/12 h-16 box-border mb-5"
+        class="w-11/12 h-16 box-border mt-3 mb-6 border rounded-lg p-1"
       />
 
       <div class="flex justify-end gap-2.5 mt-2.5">
@@ -85,7 +90,6 @@
       :categories="categories ?? []"
       :editing-task="editingTask"
       @on-close="closeSelectCategoryModal"
-      @on-save="handleSelectCategory"
     />
   </div>
 </template>

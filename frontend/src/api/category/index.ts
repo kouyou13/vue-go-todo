@@ -6,9 +6,12 @@ export const useCategories = () => {
   const API_URL: string = import.meta.env.VITE_API_URL
   const categories = ref<Category[]>([])
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (searchWord: string) => {
     try {
-      const url = `${API_URL}/categories`
+      const url =
+        searchWord !== ""
+          ? `${API_URL}/categories?search=${encodeURIComponent(searchWord)}`
+          : `${API_URL}/categories`
       const response = await fetch(url)
       categories.value = await response.json()
     } catch (error) {
