@@ -25,14 +25,14 @@ var tasks = []Task{
 }
 
 // GetAll は全タスクを返す
-func GetAll(searchTitle string) []Task {
-	if searchTitle == "" {
+func GetAll(searchWord string) []Task {
+	if searchWord == "" {
 		return tasks
 	}
 
 	var filtered []Task
 	for _, t := range tasks {
-		if strings.Contains(strings.ToLower(t.Title), strings.ToLower(searchTitle)) {
+		if strings.Contains(strings.ToLower(t.Title), strings.ToLower(searchWord)) {
 			filtered = append(filtered, t)
 		}
 	}

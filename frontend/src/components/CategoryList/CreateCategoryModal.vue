@@ -1,0 +1,56 @@
+<script setup lang="ts">
+  import { ref, onMounted } from "vue"
+
+  import { emptyCategory } from "../../api/category/util"
+  import type { Category } from "../../types"
+
+  import { colorList } from "./utils/color"
+
+  const emit = defineEmits(["onClose", "onSave"])
+
+  const editingCategory = ref<Category>({ ...emptyCategory })
+  const input = ref()
+  onMounted(() => {
+    input.value.focus()
+  })
+</script>
+
+<template>
+  <div
+    class="fixed top-0 left-0 w-full h-full bg-black/60 bg-op flex justify-center items-center z-10"
+    @click.self="emit('onClose')"
+  >
+    <div class="bg-gray-950 p-6 rounded-2xl w-1/4 shadow z-10">
+      <h2 class="text-3xl">追加</h2>
+      <p class="text-left my-1">カテゴリー名</p>
+      <input
+        ref="input"
+        v-model="editingCategory.name"
+        type="text"
+        class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
+        placeholder="カテゴリー名を入力..."
+      />
+      <p class="text-left my-1">ラベルカラー</p>
+      <div class="flex w-11/12 flex-wrap mx-6 mt-2 mb-5">
+        <div v-for="color in colorList" :key="color" class="p-1">
+          <label class="flex mr-3">
+            <input type="radio" name="color" :value="color" :checked="color === 'blue'" />
+            <div class="w-12 h-6 rounded-lg ml-1 cursor-pointer" :class="`bg-${color}-800`" />
+          </label>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2.5 mt-2.5">
+        <button class="bg-gray-100 border-0 text-black px-2 py-1.5" @click="emit('onClose')">
+          キャンセル
+        </button>
+        <button
+          class="bg-green-600 border-0 text-white px-2 py-1.5"
+          @click="emit('onSave', editingCategory)"
+        >
+          追加
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

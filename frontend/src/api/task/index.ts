@@ -11,7 +11,7 @@ export const useTasks = () => {
     try {
       const url =
         searchWord !== ""
-          ? `${API_URL}/tasks?title=${encodeURIComponent(searchWord)}`
+          ? `${API_URL}/tasks?search=${encodeURIComponent(searchWord)}`
           : `${API_URL}/tasks`
       const response = await fetch(url)
       const data: Task[] = await response.json()

@@ -19,7 +19,8 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 
 // getCategories はカテゴリー一覧取得
 func getCategories(c *gin.Context) {
-	res := GetAll()
+	searchWord := c.Query("search")
+	res := GetAll(searchWord)
 	c.JSON(http.StatusOK, res)
 }
 

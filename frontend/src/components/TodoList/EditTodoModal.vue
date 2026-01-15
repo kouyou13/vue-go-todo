@@ -5,6 +5,7 @@
   import { emptyTask } from "../../api/task/util"
   import type { Task } from "../../types"
   import SelectCategoryModal from "../CategoryList/SelectCategoryModal.vue"
+  import { convertColorText } from "../CategoryList/utils/color"
 
   const props = defineProps({
     task: {
@@ -28,18 +29,14 @@
   const closeSelectCategoryModal = () => {
     showSelectCategoryModal.value = false
   }
-  const handleSelectCategory = (selectedCategoryId: string | null) => {
-    editingTask.value.categoryId = selectedCategoryId
-    closeSelectCategoryModal()
-  }
   onMounted(() => {
-    fetchCategories()
+    fetchCategories("")
   })
 </script>
 
 <template>
   <div
-    class="fixed top-0 left-0 w-full h-full bg-black/80 bg-op flex justify-center items-center z-10"
+    class="fixed top-0 left-0 w-full h-full bg-black/60 bg-op flex justify-center items-center z-10"
     @click.self="emit('onClose')"
   >
     <div class="bg-gray-950 p-6 rounded-2xl w-1/4 shadow z-10">
@@ -48,23 +45,39 @@
       <input
         v-model="editingTask.title"
         type="text"
-        class="w-11/12 mb-5"
+        class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
         placeholder="タスク名を入力..."
       />
       <p class="text-left my-1">期限</p>
-      <input v-model="editingTask.limitedAt" type="date" class="w-11/12 mb-5" />
+      <input
+        v-model="editingTask.limitedAt"
+        type="date"
+        class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
+      />
       <p class="text-left my-1">カテゴリー</p>
-      <div class="w-11/12 h-9 mb-5 mx-auto hover:bg-gray-800" @click="openSelectCategoryModal">
-        <div v-if="editingTask.categoryId == null" class="w-full mx-1.5">なし</div>
-        <div v-else class="w-full mx-1.5" style="background-color: blue">
-          {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
+      <div
+        class="w-11/12 h-12 mt-3 mb-6 mx-auto hover:bg-gray-800 rounded-lg content-center"
+        @click="openSelectCategoryModal"
+      >
+        <div v-if="editingTask.categoryId == null" class="w-full py-1.5 rounded-lg">なし</div>
+        <div v-else class="w-full py-1.5 rounded-lg">
+          <label
+            class="p-3 rounded-lg"
+            :class="
+              convertColorText(
+                categories?.find((c) => c.id === editingTask.categoryId)?.color ?? 'blue',
+              )
+            "
+          >
+            {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
+          </label>
         </div>
       </div>
       <p class="text-left my-1">備考</p>
       <textarea
         v-model="editingTask.note"
         placeholder="memo..."
-        class="w-11/12 h-16 box-border mb-5"
+        class="w-11/12 h-16 box-border mt-3 mb-6 border rounded-lg p-1"
       />
 
       <div class="flex justify-end gap-2.5 mt-2.5">
@@ -85,7 +98,6 @@
       :categories="categories ?? []"
       :editing-task="editingTask"
       @on-close="closeSelectCategoryModal"
-      @on-save="handleSelectCategory"
     />
   </div>
 </template>

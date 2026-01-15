@@ -3,17 +3,19 @@
 
   import type { Task, Category } from "../../types"
 
+  import { convertColorText } from "./utils/color"
+
   const props = defineProps({
     categories: { type: Array as PropType<Category[]>, default: () => [] },
     editingTask: { type: Object as PropType<Task>, default: () => null },
   })
-  const emit = defineEmits(["onClose", "onSave"])
+  const emit = defineEmits(["onClose"])
   const selectedCategoryId = ref<string | null>(props.editingTask?.categoryId || null)
 </script>
 
 <template>
   <div
-    class="fixed top-0 left-0 w-full h-full bg-black/80 bg-op flex justify-center items-center z-20"
+    class="fixed top-0 left-0 w-full h-full bg-black/60 bg-op flex justify-center items-center z-20"
     @click.self="emit('onClose')"
   >
     <div class="bg-gray-950 p-6 rounded-2xl w-1/5 shadow z-20">
@@ -24,10 +26,19 @@
           <span class="max-w-9/12 px-2 rounded-md cursor-pointer">なし</span>
         </label>
       </div>
-      <div v-for="category in categories" :key="category.id" class="my-2">
+      <div v-for="category in categories" :key="category.id" class="my-3">
         <label>
-          <input v-model="selectedCategoryId" type="radio" name="category" :value="category.id" />
-          <span class="max-w-9/12 px-2 py-8 rounded-md cursor-pointer bg-blue-600">
+          <input
+            v-model="selectedCategoryId"
+            type="radio"
+            name="category"
+            :value="category.id"
+            class="mx-2"
+          />
+          <span
+            class="max-w-9/12 px-2 py-1 rounded-md cursor-pointer"
+            :class="convertColorText(category.color)"
+          >
             {{ category.name }}
           </span>
         </label>
@@ -38,7 +49,12 @@
         </button>
         <button
           class="bg-green-600 border-0 text-white px-2 py-1.5"
-          @click="emit('onSave', selectedCategoryId)"
+          @click="
+            () => {
+              editingTask.categoryId = selectedCategoryId
+              emit('onClose')
+            }
+          "
         >
           保存
         </button>
