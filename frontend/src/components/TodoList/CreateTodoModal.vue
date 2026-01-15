@@ -5,6 +5,7 @@
   import { emptyTask } from "../../api/task/util"
   import type { Task } from "../../types"
   import SelectCategoryModal from "../CategoryList/SelectCategoryModal.vue"
+  import { convertColorText } from "../CategoryList/utils/color"
 
   const emit = defineEmits(["onClose", "onSave"])
 
@@ -51,7 +52,15 @@
         >
           なし
         </div>
-        <div v-else class="w-full bg-blue-800 py-1.5 rounded-lg hover:bg-blue-900">
+        <div
+          v-else
+          class="w-full py-1.5 rounded-lg"
+          :class="
+            convertColorText(
+              categories?.find((c) => c.id === editingTask.categoryId)?.color ?? 'blue',
+            )
+          "
+        >
           {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
         </div>
       </div>

@@ -3,6 +3,8 @@
 
   import type { Task, Category } from "../../types"
 
+  import { convertColorText } from "./utils/color"
+
   const props = defineProps({
     categories: { type: Array as PropType<Category[]>, default: () => [] },
     editingTask: { type: Object as PropType<Task>, default: () => null },
@@ -24,7 +26,7 @@
           <span class="max-w-9/12 px-2 rounded-md cursor-pointer">なし</span>
         </label>
       </div>
-      <div v-for="category in categories" :key="category.id" class="my-4">
+      <div v-for="category in categories" :key="category.id" class="my-3">
         <label>
           <input
             v-model="selectedCategoryId"
@@ -33,7 +35,10 @@
             :value="category.id"
             class="mx-2"
           />
-          <span class="max-w-9/12 px-2 py-1 rounded-md cursor-pointer bg-blue-800">
+          <span
+            class="max-w-9/12 px-2 py-1 rounded-md cursor-pointer"
+            :class="convertColorText(category.color)"
+          >
             {{ category.name }}
           </span>
         </label>

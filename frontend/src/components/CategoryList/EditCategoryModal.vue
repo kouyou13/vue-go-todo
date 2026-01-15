@@ -1,8 +1,10 @@
 <script setup lang="ts">
-  import { ref, type PropType } from "vue"
+  import { ref, type PropType, onMounted } from "vue"
 
   import { emptyCategory } from "../../api/category/util"
   import type { Category } from "../../types"
+
+  import { colorList, convertColorText } from "./utils/color"
 
   const props = defineProps({
     category: {
@@ -14,7 +16,12 @@
   if (!props.category) {
     alert("タスクの取得に失敗しました")
   }
+
   const editingCategory = ref<Category>(props.category ? { ...props.category } : emptyCategory)
+  const input = ref()
+  onMounted(() => {
+    input.value.focus()
+  })
 </script>
 
 <template>
@@ -26,11 +33,21 @@
       <h2 class="text-3xl">編集</h2>
       <p class="text-left my-1">カテゴリー名</p>
       <input
+        ref="input"
         v-model="editingCategory.name"
         type="text"
         class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
         placeholder="カテゴリー名を入力..."
       />
+      <p class="text-left my-1">ラベルカラー</p>
+      <div class="flex w-11/12 flex-wrap mx-6 mt-2 mb-5">
+        <div v-for="color in colorList" :key="color" class="p-1">
+          <label class="flex mr-3">
+            <input v-model="editingCategory.color" type="radio" name="color" :value="color" />
+            <div class="w-12 h-6 rounded-lg ml-1 cursor-pointer" :class="convertColorText(color)" />
+          </label>
+        </div>
+      </div>
 
       <div class="flex justify-end gap-2.5 mt-2.5">
         <button class="bg-gray-100 border-0 text-black px-2 py-1.5" @click="emit('onClose')">

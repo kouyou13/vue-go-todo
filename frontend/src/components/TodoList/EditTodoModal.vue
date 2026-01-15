@@ -5,6 +5,7 @@
   import { emptyTask } from "../../api/task/util"
   import type { Task } from "../../types"
   import SelectCategoryModal from "../CategoryList/SelectCategoryModal.vue"
+  import { convertColorText } from "../CategoryList/utils/color"
 
   const props = defineProps({
     task: {
@@ -54,15 +55,22 @@
         class="w-11/12 mt-3 mb-6 border rounded-lg p-1"
       />
       <p class="text-left my-1">カテゴリー</p>
-      <div class="w-11/12 h-9 mt-3 mb-6 mx-auto" @click="openSelectCategoryModal">
-        <div
-          v-if="editingTask.categoryId == null"
-          class="w-full py-1.5 rounded-lg hover:bg-gray-800"
-        >
-          なし
-        </div>
-        <div v-else class="w-full bg-blue-800 py-1.5 rounded-lg hover:bg-blue-900">
-          {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
+      <div
+        class="w-11/12 h-12 mt-3 mb-6 mx-auto hover:bg-gray-800 rounded-lg content-center"
+        @click="openSelectCategoryModal"
+      >
+        <div v-if="editingTask.categoryId == null" class="w-full py-1.5 rounded-lg">なし</div>
+        <div v-else class="w-full py-1.5 rounded-lg">
+          <label
+            class="p-3 rounded-lg"
+            :class="
+              convertColorText(
+                categories?.find((c) => c.id === editingTask.categoryId)?.color ?? 'blue',
+              )
+            "
+          >
+            {{ categories?.find((c) => c.id === editingTask.categoryId)?.name }}
+          </label>
         </div>
       </div>
       <p class="text-left my-1">備考</p>

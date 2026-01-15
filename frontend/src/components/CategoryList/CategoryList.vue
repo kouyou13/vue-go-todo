@@ -4,6 +4,7 @@
   import type { Category } from "../../types"
 
   import EditCategoryModal from "./EditCategoryModal.vue"
+  import { convertColorText } from "./utils/color"
 
   defineProps({
     categories: {
@@ -29,7 +30,9 @@
   <table class="w-full">
     <tr v-for="category in categories" :key="category.id" class="border-b">
       <td class="text-lg">
-        {{ category.name }}
+        <label class="p-2 rounded-lg" :class="convertColorText(category.color)">
+          {{ category.name }}
+        </label>
       </td>
       <td class="w-1/18 pl-2">
         <button
